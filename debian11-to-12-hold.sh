@@ -108,3 +108,7 @@ if [[ $reboot_confirm == "y" || $reboot_confirm == "Y" ]]; then
 else
   echo "请手动运行 reboot 命令以完成升级。"
 fi
+
+echo "升级完成，按 Ctrl+A D 退出会话，screen 会话仍会保留"
+bash
+
