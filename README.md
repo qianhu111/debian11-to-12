@@ -36,6 +36,19 @@
 bash <(curl -fsSL https://raw.githubusercontent.com/qianhu111/debian11-to-12/main/debian11-to-12.sh)
 ```
 
+保持会话hold版：
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/qianhu111/debian11-to-12/main/debian11-to-12-hold.sh)
+```
+* 一旦启动，会话会被转入 screen 或 tmux 中，断开 SSH 后可用：
+
+```bash
+screen -r debian-upgrade
+# 或
+tmux attach -t debian-upgrade
+```
+
 ### 📦 Ubuntu 20.04 / 22.04 ➜ Ubuntu 24.04
 
 ```bash
