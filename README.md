@@ -36,31 +36,9 @@
 bash <(curl -fsSL https://raw.githubusercontent.com/qianhu111/debian11-to-12/main/debian11-to-12.sh)
 ```
 
-**若更新升级时中断ssh连接，请使用保持会话hold版：**
-
+* 稳定升级版：
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/qianhu111/debian11-to-12/main/debian11-to-12-hold.sh)
-```
-* 一旦启动，会话会被转入 screen 或 tmux 中，断开 SSH 后可用：
-
-```bash
-screen -r debian-upgrade
-# 或
-tmux attach -t debian-upgrade
-```
-
-* 🧹 卸载 screen：
-```bash
-sudo apt remove --purge screen
-```
-* 🧹 卸载 tmux：
-```bash
-sudo apt remove --purge tmux
-```
-* 清理它们的配置文件和未用依赖：
-```bash
-sudo apt autoremove --purge
-sudo apt clean
+bash <(curl -fsSL https://raw.githubusercontent.com/qianhu111/debian11-to-12/main/debian11-to-12-2.sh)
 ```
 
 ### 📦 Ubuntu 20.04 / 22.04 ➜ Ubuntu 24.04
