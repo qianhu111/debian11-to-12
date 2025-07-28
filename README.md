@@ -36,7 +36,7 @@
 bash <(curl -fsSL https://raw.githubusercontent.com/qianhu111/debian11-to-12/main/debian11-to-12.sh)
 ```
 
-保持会话hold版：
+**若更新升级时中断ssh连接，请使用保持会话hold版：**
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/qianhu111/debian11-to-12/main/debian11-to-12-hold.sh)
@@ -47,6 +47,20 @@ bash <(curl -fsSL https://raw.githubusercontent.com/qianhu111/debian11-to-12/mai
 screen -r debian-upgrade
 # 或
 tmux attach -t debian-upgrade
+```
+
+* 🧹 卸载 screen：
+```bash
+sudo apt remove --purge screen
+```
+* 🧹 卸载 tmux：
+```bash
+sudo apt remove --purge tmux
+```
+* 清理它们的配置文件和未用依赖：
+```bash
+sudo apt autoremove --purge
+sudo apt clean
 ```
 
 ### 📦 Ubuntu 20.04 / 22.04 ➜ Ubuntu 24.04
