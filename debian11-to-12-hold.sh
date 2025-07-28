@@ -2,37 +2,58 @@
 
 set -e
 
-# === 保持升级过程不中断：使用 screen 或 tmux ===
-if [[ -z "$INSIDE_SESSION" ]]; then
-  echo "💡 即将进入持久会话 (screen/tmux)，升级过程中可安全断开 SSH"
-  export INSIDE_SESSION=1
+#!/bin/bash
+set -e
 
-  # 优先使用 screen
-  if ! command -v screen >/dev/null 2>&1; then
-    echo "📦 未检测到 screen，尝试安装中..."
-    apt update && apt install -y screen || true
-  fi
+SESSION_NAME="debian-upgrade"
 
-  if command -v screen >/dev/null 2>&1; then
-    echo "➡️ 使用 screen 启动会话：debian-upgrade"
-    exec screen -S debian-upgrade bash "$0"
-    exit
-  fi
+# 检测是否已在 screen 或 tmux 会话中
+if [ -n "$STY" ] || [ -n "$TMUX" ]; then
+    echo "✅ 已在 screen 或 tmux 会话中，继续执行脚本..."
+    # 继续执行主逻辑
+    return 0 2>/dev/null || true
+fi
 
-  # 退而求其次使用 tmux
-  if ! command -v tmux >/dev/null 2>&1; then
-    echo "📦 未检测到 tmux，尝试安装中..."
-    apt update && apt install -y tmux || true
-  fi
+# 检查 screen 和 tmux 是否存在
+HAS_SCREEN=$(command -v screen >/dev/null 2>&1 && echo yes || echo no)
+HAS_TMUX=$(command -v tmux >/dev/null 2>&1 && echo yes || echo no)
 
-  if command -v tmux >/dev/null 2>&1; then
-    echo "➡️ 使用 tmux 启动会话：debian-upgrade"
-    exec tmux new-session -s debian-upgrade "$0"
-    exit
-  fi
+# 如果两者都不存在，提示选择
+if [ "$HAS_SCREEN" = "no" ] && [ "$HAS_TMUX" = "no" ]; then
+    echo "❌ 未检测到 screen 或 tmux"
+    echo "请选择你要安装的会话管理工具："
+    echo "1. 安装并使用 screen（推荐）"
+    echo "2. 安装并使用 tmux"
+    read -rp "请输入选项 [1/2]: " choice
+    if [ "$choice" = "1" ]; then
+        apt update && apt install -y screen
+        echo "✅ 已安装 screen，正在进入会话..."
+        screen -S "$SESSION_NAME" -dm bash "$0"
+        echo "👉 请使用 'screen -r $SESSION_NAME' 查看进度"
+        exit 0
+    elif [ "$choice" = "2" ]; then
+        apt update && apt install -y tmux
+        echo "✅ 已安装 tmux，正在进入会话..."
+        tmux new-session -d -s "$SESSION_NAME" "$0"
+        echo "👉 请使用 'tmux attach -t $SESSION_NAME' 查看进度"
+        exit 0
+    else
+        echo "⚠️ 输入错误，退出。"
+        exit 1
+    fi
+fi
 
-  echo "❌ 无法安装 screen 或 tmux，请手动安装后重试。"
-  exit 1
+# 若只存在其中一个，则直接使用
+if [ "$HAS_SCREEN" = "yes" ]; then
+    echo "💡 检测到 screen，自动进入会话..."
+    screen -S "$SESSION_NAME" -dm bash "$0"
+    echo "👉 请使用 'screen -r $SESSION_NAME' 查看进度"
+    exit 0
+elif [ "$HAS_TMUX" = "yes" ]; then
+    echo "💡 检测到 tmux，自动进入会话..."
+    tmux new-session -d -s "$SESSION_NAME" "$0"
+    echo "👉 请使用 'tmux attach -t $SESSION_NAME' 查看进度"
+    exit 0
 fi
 
 echo "=== Debian 11 -> Debian 12 OTA 升级脚本 ==="
